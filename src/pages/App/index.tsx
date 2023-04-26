@@ -10,7 +10,8 @@ import {
 import { Snake, Direction } from "./interfaces";
 import {
   formatKeyValue,
-  getNewFoodBoardValue,
+  generateNewRandomFood,
+  getTypeOfBlock,
   initBoard,
   initSnake,
   validateDirection,
@@ -37,42 +38,23 @@ export function AppPage() {
 
   const board = useMemo(() => initBoard(boardSize), []);
 
-  const renderGame = (boardValue: number) => {
-    const isHead = boardValue === snake.current[0].boardValue;
+  const renderBlock = (boardValue: number) => {
+    const blockType = getTypeOfBlock(boardValue, snake.current, foodValue);
 
-    if (isHead) {
+    if (blockType === "head") {
       return <S.SnakeHead direction={direction} key={boardValue} />;
     }
 
-    const isTail =
-      snake.current[snake.current.length - 1].boardValue === boardValue;
-
-    if (isTail) {
-      const tailDifference =
-        Number(snake.current[snake.current.length - 1].boardValue) -
-        Number(snake.current[snake.current.length - 2].boardValue);
-
-      const directionByTailDifference: { [key: number]: Direction } = {
-        [30]: "Up",
-        [-30]: "Down",
-        [1]: "Left",
-        [-1]: "Right",
-      };
-
-      const tailDirection = directionByTailDifference[tailDifference];
-
+    if (blockType.includes("tail")) {
+      const tailDirection = blockType.split(".")[1] as Direction;
       return <S.SnakeTail key={boardValue} direction={tailDirection} />;
     }
 
-    const isBody = snake.current.some((item) => item.boardValue === boardValue);
-
-    if (isBody) {
+    if (blockType === "body") {
       return <S.SnakeBody key={boardValue} />;
     }
 
-    const isFood = foodValue === boardValue;
-
-    if (isFood) {
+    if (blockType === "food") {
       return <S.Food key={boardValue} />;
     }
 
@@ -88,7 +70,7 @@ export function AppPage() {
     setDirection(null);
 
     setSnake(initialSnake);
-    setFoodValue(getNewFoodBoardValue(boardSize, initialSnake.current));
+    setFoodValue(generateNewRandomFood(boardSize, initialSnake.current));
   }, []);
 
   const handleGameOver = useCallback(() => {
@@ -208,7 +190,7 @@ export function AppPage() {
   }, []);
 
   const handleEating = useCallback(() => {
-    setFoodValue(getNewFoodBoardValue(boardSize, snake.current));
+    setFoodValue(generateNewRandomFood(boardSize, snake.current));
     setScore((prev) => ({ ...prev, current: prev.current + 1 }));
 
     setSnake((prev) => ({
@@ -304,7 +286,7 @@ export function AppPage() {
         {Boolean(snake.current.length) && (
           <S.Board>
             {board.blocks.map((column) =>
-              column.map((boardValue) => renderGame(boardValue))
+              column.map((boardValue) => renderBlock(boardValue))
             )}
           </S.Board>
         )}

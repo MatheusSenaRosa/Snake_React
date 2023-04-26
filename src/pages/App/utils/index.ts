@@ -6,7 +6,7 @@ import {
   Snake,
 } from "../interfaces";
 
-export const directionByTailDifference: DirectionByTailDifference = {
+const directionByTailDifference: DirectionByTailDifference = {
   [30]: "Up",
   [-30]: "Down",
   [1]: "Left",
@@ -57,7 +57,7 @@ export const initSnake = (boardSize: number): Snake => {
   };
 };
 
-export const getNewFoodBoardValue = (
+export const generateNewRandomFood = (
   boardSize: number,
   currentSnake: CurrentPreviousSnake[]
 ) => {
@@ -101,4 +101,32 @@ export const validateDirection = (
   if (!newDirection || isSameDirection || isOpposite) return false;
 
   return true;
+};
+
+export const getTypeOfBlock = (
+  boardValue: number,
+  currentSnake: CurrentPreviousSnake[],
+  foodValue: number
+) => {
+  if (boardValue === currentSnake[0].boardValue) {
+    return "head";
+  }
+
+  if (currentSnake[currentSnake.length - 1].boardValue === boardValue) {
+    const tailDifference =
+      Number(currentSnake[currentSnake.length - 1].boardValue) -
+      Number(currentSnake[currentSnake.length - 2].boardValue);
+
+    const tailDirection = directionByTailDifference[tailDifference];
+
+    return `tail.${tailDirection}`;
+  }
+
+  if (currentSnake.some((item) => item.boardValue === boardValue)) {
+    return "body";
+  }
+
+  if (foodValue === boardValue) return "food";
+
+  return "board";
 };
