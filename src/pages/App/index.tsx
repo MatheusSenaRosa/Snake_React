@@ -8,7 +8,6 @@ import {
 } from "react";
 
 import { Snake, Direction } from "./interfaces";
-import tongueImg from "../../assets/tongue.png";
 import {
   formatKeyValue,
   getNewFoodBoardValue,
@@ -42,11 +41,7 @@ export function AppPage() {
     const isHead = boardValue === snake.current[0].boardValue;
 
     if (isHead) {
-      return (
-        <S.SnakeHead direction={direction} key={boardValue}>
-          <img src={tongueImg} alt="Tongue" />
-        </S.SnakeHead>
-      );
+      return <S.SnakeHead direction={direction} key={boardValue} />;
     }
 
     const isTail =

@@ -60,79 +60,34 @@ export const SnakeHead = styled.div<{ direction: Direction }>`
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
 
-    :after {
-      content: "";
-      position: absolute;
-
-      background-color: #60cbff;
-      width: ${rem(21)};
-      height: ${rem(23)};
-
-      border-radius: 50% 50% 0 0;
-    }
+    background-color: #60cbff;
 
     ${() => {
       switch (direction) {
         case "Up":
           return css`
-            img {
-              transform: rotate(180deg);
-              margin-bottom: ${rem(35)};
-            }
-
-            :after {
-              border-radius: 50% 50% 0 0;
-            }
+            border-radius: 50% 50% 0 0;
           `;
 
         case "Down":
           return css`
-            img {
-              transform: rotate(180deg);
-              margin-bottom: ${rem(-35)};
-            }
-
-            :after {
-              border-radius: 0 0 50% 50%;
-            }
+            border-radius: 0 0 50% 50%;
           `;
 
         case "Left":
           return css`
-            img {
-              transform: rotate(-90deg);
-              margin-right: ${rem(35)};
-            }
-
-            :after {
-              border-radius: 50% 0 0 50%;
-            }
+            border-radius: 50% 0 0 50%;
           `;
 
         case "Right":
           return css`
-            img {
-              transform: rotate(90deg);
-              margin-right: ${rem(-35)};
-            }
-
-            :after {
-              border-radius: 0 50% 50% 0;
-            }
+            border-radius: 0 50% 50% 0;
           `;
 
         default:
           return css`
-            img {
-              transform: rotate(180deg);
-              margin-bottom: ${rem(35)};
-            }
-
-            :after {
-              border-radius: 50% 50% 0 0;
-            }
+            border-radius: 50% 50% 0 0;
           `;
       }
     }}
@@ -190,13 +145,6 @@ export const Food = styled.div`
   align-items: center;
   justify-content: center;
 
-  :after {
-    content: "";
-
-    width: ${rem(21)};
-    height: ${rem(21)};
-    border-radius: 50%;
-
-    background-color: #ff003d;
-  }
+  background-color: #ff003d;
+  border-radius: 50%;
 `;
