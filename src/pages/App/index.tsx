@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { Snake, Direction } from "./interfaces";
+import { Snake } from "./interfaces";
 import {
   formatKeyValue,
   generateNewRandomFood,
@@ -18,6 +18,8 @@ import {
 } from "./utils";
 
 import * as S from "./styles";
+import { Direction } from "@interfaces";
+import { Block } from "../../components/index";
 
 const boardSize = 30;
 const boardVolume = boardSize * boardSize;
@@ -37,29 +39,6 @@ export function AppPage() {
   const intervalsRef = useRef<NodeJS.Timer[]>([]);
 
   const board = useMemo(() => initBoard(boardSize), []);
-
-  const renderBlock = (boardValue: number) => {
-    const blockType = getTypeOfBlock(boardValue, snake.current, foodValue);
-
-    if (blockType === "head") {
-      return <S.SnakeHead direction={direction} key={boardValue} />;
-    }
-
-    if (blockType.includes("tail")) {
-      const tailDirection = blockType.split(".")[1] as Direction;
-      return <S.SnakeTail key={boardValue} direction={tailDirection} />;
-    }
-
-    if (blockType === "body") {
-      return <S.SnakeBody key={boardValue} />;
-    }
-
-    if (blockType === "food") {
-      return <S.Food key={boardValue} />;
-    }
-
-    return <S.BoardBlock key={boardValue} />;
-  };
 
   const initGame = useCallback(() => {
     const highestScore = localStorage.getItem("@SnakeGame:Highest_Score");
@@ -286,7 +265,12 @@ export function AppPage() {
         {Boolean(snake.current.length) && (
           <S.Board>
             {board.blocks.map((column) =>
-              column.map((boardValue) => renderBlock(boardValue))
+              column.map((boardValue) => (
+                <Block
+                  type={getTypeOfBlock(boardValue, snake.current, foodValue)}
+                  direction={direction}
+                />
+              ))
             )}
           </S.Board>
         )}

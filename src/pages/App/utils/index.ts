@@ -1,7 +1,7 @@
+import { Direction } from "@interfaces";
 import {
   Board,
   CurrentPreviousSnake,
-  Direction,
   DirectionByTailDifference,
   Snake,
 } from "../interfaces";

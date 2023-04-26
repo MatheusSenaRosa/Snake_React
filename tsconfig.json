@@ -22,7 +22,9 @@
     /* Path Mapping */
     "baseUrl": "./src",
     "paths": {
-      "@pages": ["./pages/index"]
+      "@pages": ["./pages/index"],
+      "@components": ["./components/index"],
+      "@interfaces": ["./interfaces/index"]
     }
   },
   "include": ["src"],

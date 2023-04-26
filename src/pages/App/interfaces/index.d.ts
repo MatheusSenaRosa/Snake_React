@@ -11,6 +11,4 @@ export type Board = {
   rightWalls: number[];
 };
 
-export type Direction = "Up" | "Down" | "Left" | "Right" | null;
-
 export type DirectionByTailDifference = { [key: number]: Direction };
