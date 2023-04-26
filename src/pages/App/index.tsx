@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import { Snake, Direction } from "./interfaces";
 import tongueImg from "../../assets/tongue.png";
 import {
@@ -12,14 +20,19 @@ import {
 import * as S from "./styles";
 
 const boardSize = 30;
+const boardVolume = boardSize * boardSize;
 
 export function AppPage() {
+  const [direction, setDirection] = useState<Direction>(null);
+  const [foodValue, setFoodValue] = useState(0);
+  const [score, setScore] = useState({
+    current: 0,
+    highest: 0,
+  });
   const [snake, setSnake] = useState<Snake>({
     current: [],
     previous: [],
   });
-  const [direction, setDirection] = useState<Direction>(null);
-  const [foodValue, setFoodValue] = useState(0);
 
   const intervalsRef = useRef<NodeJS.Timer[]>([]);
 
@@ -30,7 +43,7 @@ export function AppPage() {
 
     if (isHead) {
       return (
-        <S.SnakeHead direction={direction}>
+        <S.SnakeHead direction={direction} key={boardValue}>
           <img src={tongueImg} alt="Tongue" />
         </S.SnakeHead>
       );
@@ -53,37 +66,45 @@ export function AppPage() {
 
       const tailDirection = directionByTailDifference[tailDifference];
 
-      return <S.SnakeTail direction={tailDirection} />;
+      return <S.SnakeTail key={boardValue} direction={tailDirection} />;
     }
 
     const isBody = snake.current.some((item) => item.boardValue === boardValue);
 
     if (isBody) {
-      return <S.SnakeBody />;
+      return <S.SnakeBody key={boardValue} />;
     }
 
     const isFood = foodValue === boardValue;
 
     if (isFood) {
-      return <S.Food />;
+      return <S.Food key={boardValue} />;
     }
 
-    return <S.BoardBlock />;
+    return <S.BoardBlock key={boardValue} />;
   };
 
-  const initGame = () => {
+  const initGame = useCallback(() => {
+    const highestScore = localStorage.getItem("@SnakeGame:Highest_Score");
+    setScore({ current: 0, highest: Number(highestScore) || 0 });
+
     const initialSnake = initSnake(boardSize);
+
+    setDirection(null);
 
     setSnake(initialSnake);
     setFoodValue(getNewFoodBoardValue(boardSize, initialSnake.current));
-    setDirection(null);
-  };
+  }, []);
 
   const handleGameOver = useCallback(() => {
+    if (score.highest < score.current) {
+      localStorage.setItem("@SnakeGame:Highest_Score", String(score.current));
+    }
     stopCurrentInterval();
     initGame();
+
     alert("aaaaaa");
-  }, []);
+  }, [initGame, score]);
 
   const stopCurrentInterval = () => {
     const { length } = intervalsRef.current;
@@ -193,6 +214,7 @@ export function AppPage() {
 
   const handleEating = useCallback(() => {
     setFoodValue(getNewFoodBoardValue(boardSize, snake.current));
+    setScore((prev) => ({ ...prev, current: prev.current + 1 }));
 
     setSnake((prev) => ({
       previous: [...prev.current],
@@ -213,6 +235,31 @@ export function AppPage() {
     },
     [handleMovementInterval, direction]
   );
+
+  const validateIfSnakeHasCollided = useCallback(() => {
+    const previousSnakeHead = snake.previous[0].boardValue as number;
+    const currentSnakeHead = snake.current[0].boardValue as number;
+
+    const hasCollidedRight =
+      board.leftWalls.includes(currentSnakeHead) &&
+      board.rightWalls.includes(previousSnakeHead);
+
+    const hasCollidedLeft =
+      board.rightWalls.includes(currentSnakeHead) &&
+      board.leftWalls.includes(previousSnakeHead);
+
+    const hasCollidedHorizontal =
+      currentSnakeHead < 1 || currentSnakeHead > boardVolume;
+    const hasCollidedVertical = hasCollidedRight || hasCollidedLeft;
+
+    const hasCollidedItself = snake.current.some((item, index) => {
+      if (index === 0) return false;
+
+      return item.boardValue === currentSnakeHead;
+    });
+
+    return hasCollidedHorizontal || hasCollidedVertical || hasCollidedItself;
+  }, [board, snake]);
 
   useEffect(() => {
     if (snake.current.length && snake.previous.length) {
@@ -239,39 +286,24 @@ export function AppPage() {
 
   useEffect(() => {
     initGame();
-  }, []);
+  }, [initGame]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (snake.current.length && snake.previous.length) {
-      const previousSnakeHead = snake.previous[0].boardValue as number;
-      const currentSnakeHead = snake.current[0].boardValue as number;
+      const hasCollided = validateIfSnakeHasCollided();
 
-      const boardVolume = boardSize * boardSize;
-
-      if (currentSnakeHead < 1 || currentSnakeHead > boardVolume) {
-        handleGameOver();
-      }
-
-      const hasPassedRightWall =
-        board.leftWalls.includes(currentSnakeHead) &&
-        board.rightWalls.includes(previousSnakeHead);
-
-      const hasPassedLeftWall =
-        board.rightWalls.includes(currentSnakeHead) &&
-        board.leftWalls.includes(previousSnakeHead);
-
-      if (hasPassedRightWall || hasPassedLeftWall) {
+      if (hasCollided) {
         handleGameOver();
       }
     }
-  }, [board, handleGameOver, snake]);
+  }, [handleGameOver, snake, validateIfSnakeHasCollided]);
 
   return (
     <S.Container>
       <S.GameWrapper>
         <S.Header>
-          <h3>Score: 0</h3>
-          <h3>High Score: 11</h3>
+          <h3>Score: {score.current}</h3>
+          <h3>High Score: {score.highest}</h3>
         </S.Header>
 
         {Boolean(snake.current.length) && (

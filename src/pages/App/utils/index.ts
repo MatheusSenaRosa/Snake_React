@@ -48,7 +48,8 @@ export const initBoard = (boardSize: number): Board => {
 };
 
 export const initSnake = (boardSize: number): Snake => {
-  const boardValue = Math.ceil(Math.random() * (boardSize * boardSize));
+  const boardVolume = boardSize * boardSize;
+  const boardValue = Math.ceil(Math.random() * boardVolume);
 
   return {
     previous: [],
@@ -60,7 +61,8 @@ export const getNewFoodBoardValue = (
   boardSize: number,
   currentSnake: CurrentPreviousSnake[]
 ) => {
-  const board = Array(boardSize * boardSize)
+  const boardVolume = boardSize * boardSize;
+  const board = Array(boardVolume)
     .fill(null)
     .map((_, index) => index + 1);
 
