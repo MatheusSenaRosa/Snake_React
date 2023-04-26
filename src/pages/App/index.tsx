@@ -17,9 +17,10 @@ import {
   validateDirection,
 } from "./utils";
 
-import * as S from "./styles";
 import { Direction } from "@interfaces";
-import { Block } from "../../components/index";
+import { Block, StartModal } from "@components";
+
+import * as S from "./styles";
 
 const boardSize = 30;
 const boardVolume = boardSize * boardSize;
@@ -58,8 +59,6 @@ export function AppPage() {
     }
     stopCurrentInterval();
     initGame();
-
-    alert("aaaaaa");
   }, [initGame, score]);
 
   const stopCurrentInterval = () => {
@@ -255,26 +254,30 @@ export function AppPage() {
   }, [handleGameOver, snake, validateIfSnakeHasCollided]);
 
   return (
-    <S.Container>
-      <S.GameWrapper>
-        <S.Header>
-          <h3>Score: {score.current}</h3>
-          <h3>High Score: {score.highest}</h3>
-        </S.Header>
+    <>
+      <S.Container>
+        <S.GameWrapper>
+          <S.Header>
+            <h3>Score: {score.current}</h3>
+            <h3>High Score: {score.highest}</h3>
+          </S.Header>
 
-        {Boolean(snake.current.length) && (
-          <S.Board>
-            {board.blocks.map((column) =>
-              column.map((boardValue) => (
-                <Block
-                  type={getTypeOfBlock(boardValue, snake.current, foodValue)}
-                  direction={direction}
-                />
-              ))
-            )}
-          </S.Board>
-        )}
-      </S.GameWrapper>
-    </S.Container>
+          {Boolean(snake.current.length) && (
+            <S.Board>
+              {board.blocks.map((column) =>
+                column.map((boardValue) => (
+                  <Block
+                    type={getTypeOfBlock(boardValue, snake.current, foodValue)}
+                    direction={direction}
+                  />
+                ))
+              )}
+            </S.Board>
+          )}
+        </S.GameWrapper>
+      </S.Container>
+
+      <StartModal isOpen={direction === null} />
+    </>
   );
 }

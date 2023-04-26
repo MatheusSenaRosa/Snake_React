@@ -24,7 +24,10 @@
     "paths": {
       "@pages": ["./pages/index"],
       "@components": ["./components/index"],
-      "@interfaces": ["./interfaces/index"]
+      "@interfaces": ["./interfaces/index"],
+      "@animations": ["./styles/animations/index"],
+      "@styles/*": ["./styles/*"],
+      "@assets": ["./assets"]
     }
   },
   "include": ["src"],
